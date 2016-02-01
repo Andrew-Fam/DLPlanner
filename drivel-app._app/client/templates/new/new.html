@@ -1,0 +1,345 @@
+<template name="New">
+	<div class="new">
+		<div class="clearfix page-title">
+			<div class="bg">
+			</div>
+			<h3 class="pull-left">
+				{{newLearnerName}}
+			</h3>
+			<div class="pull-left">
+				&nbsp;
+				&nbsp;
+			</div>
+			<h5 class="pull-left">
+				<a href="tel:{{learner.phone}}">
+					<i class="glyphicon glyphicon-earphone"></i>
+					{{learner.phone}}
+				</a>
+			</h5>
+			<button class="btn btn-primary btn-md pull-right">
+				&nbsp;&nbsp;&nbsp;SAVE&nbsp;&nbsp;&nbsp;
+			</button>
+		</div>
+		<ul class="nav nav-tabs page-tabs" role="tablist">
+		    <li role="presentation" class="active"><a href="#personal-id" aria-controls="home" role="tab" data-toggle="tab">Personal ID</a></li><!--
+		    --><li role="presentation" class=""><a href="#learner-availability" aria-controls="profile" role="tab" data-toggle="tab">Availability</a></li><!--
+		    --><li role="presentation" class=""><a href="#learner-notes" aria-controls="profile" role="tab" data-toggle="tab">Learner's Notes</a></li>
+		</ul>
+		<br/>
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane active" id="personal-id">
+				<div class="container-fluid">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-sm-8">
+								<div class="clearfix"><h6>PERSONAL INFO</h6></div>
+								<hr/>
+								<div class="row">
+									<div class="col-sm-8">
+										<div class="form-group">
+											<label for="fullName">Full Name</label>
+											<input type="text" class="form-control" id="fullName" placeholder="Full Name">
+										</div>
+									</div>
+									<div class="col-sm-8">
+										<div class="form-group">
+											<label for="alias">Alias</label>
+											<input type="text" class="form-control" id="alias" placeholder="Alias">
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-sm-8">
+										<div class="form-group">
+											<label for="dob">Date of Birth</label>
+											<input type="text" class="form-control date-picker" id="dob" placeholder="">
+										</div>
+									</div>
+									<div class="col-sm-8">
+										<div class="form-group">
+											<label for="phone">Phone</label>
+											<input type="text" class="form-control" id="phone" placeholder="Phone">
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-sm-16">
+										<div class="form-group">
+											<label for="address">Address</label>
+											<input type="text" class="form-control" id="address" placeholder="Address">
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-8">
+								<div class="clearfix">
+									<h6 class="pull-left">
+										LICENSE
+									</h6>
+									<label class="pull-right">
+							          	Aus. &nbsp;&nbsp;<input class="js-switch" id="international-license-check" type="checkbox"> &nbsp;&nbsp;Int.
+							        </label>
+								</div>
+								<hr/>
+								<div class="row">
+									<div class="col-sm-16">
+										<div class="form-group">
+											<label for="license-number">License Number</label>
+											<input type="text" class="form-control" id="license-number" placeholder="">
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-sm-16">
+										<div class="form-group">
+											<label for="card-number">Card Number</label>
+											<input type="text" class="form-control" id="card-number" placeholder="">
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-sm-16">
+										<div class="form-group">
+											<label for="expiry">Expiry</label>
+											<input type="text" class="form-control date-picker" id="expiry" placeholder="">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div role="tabpanel" class="tab-pane" id="learner-availability">
+				<div class="container-fluid">
+					<div class="container-fluid">
+						<div class="availability-picker clearfix" id="availability-picker--mon">
+							<div class="availability-picker--date-label">
+								MON
+							</div>
+							<div class="availability-picker--time-unit-container clearfix">
+							{{#each learner.availability.mon}}
+								<div class="availability-picker--time-unit {{#if this.hourMark}}hour{{/if}} {{#if this.active}}active{{/if}} {{this.markerType}}" >
+									<div class="availability-picker--time-unit--time-label start">
+										{{this.start.hour}}:{{this.start.minute}}
+									</div>
+									<div class="availability-picker--time-unit--time-label default">
+										{{this.start.hour}}:{{this.start.minute}}
+									</div>
+									<div class="availability-picker--time-unit--time-label end">
+										{{this.end.hour}}:{{this.end.minute}}
+									</div>
+								</div>
+							{{/each}}
+							</div>
+							<div class="availability-picker--all-day-toggle">
+								<label>
+						          	<input class="icheck" type="checkbox"> ALL-DAY
+						        </label>
+							</div>
+						</div>
+						<div class="availability-picker clearfix" id="availability-picker--tue">
+							<div class="availability-picker--date-label">
+								TUE
+							</div>
+							<div class="availability-picker--time-unit-container clearfix">
+							{{#each learner.availability.tue}}
+								<div class="availability-picker--time-unit {{#if this.hourMark}}hour{{/if}} {{#if this.active}}active{{/if}} {{this.markerType}}" >
+									<div class="availability-picker--time-unit--time-label start">
+										{{this.start.hour}}:{{this.start.minute}}
+									</div>
+									<div class="availability-picker--time-unit--time-label default">
+										{{this.start.hour}}:{{this.start.minute}}
+									</div>
+									<div class="availability-picker--time-unit--time-label end">
+										{{this.end.hour}}:{{this.end.minute}}
+									</div>
+								</div>
+							{{/each}}
+							</div>
+							<div class="availability-picker--all-day-toggle">
+								<label>
+						          	<input class="icheck" type="checkbox"> ALL-DAY
+						        </label>
+							</div>
+						</div>
+						<div class="availability-picker clearfix" id="availability-picker--wed">
+							<div class="availability-picker--date-label">
+								WED
+							</div>
+							<div class="availability-picker--time-unit-container clearfix">
+							{{#each learner.availability.wed}}
+								<div class="availability-picker--time-unit {{#if this.hourMark}}hour{{/if}} {{#if this.active}}active{{/if}} {{this.markerType}}" >
+									<div class="availability-picker--time-unit--time-label start">
+										{{this.start.hour}}:{{this.start.minute}}
+									</div>
+									<div class="availability-picker--time-unit--time-label default">
+										{{this.start.hour}}:{{this.start.minute}}
+									</div>
+									<div class="availability-picker--time-unit--time-label end">
+										{{this.end.hour}}:{{this.end.minute}}
+									</div>
+								</div>
+							{{/each}}
+							</div>
+							<div class="availability-picker--all-day-toggle">
+								<label>
+						          	<input class="icheck" type="checkbox"> ALL-DAY
+						        </label>
+							</div>
+						</div>
+						<div class="availability-picker clearfix" id="availability-picker--thu">
+							<div class="availability-picker--date-label">
+								THU
+							</div>
+							<div class="availability-picker--time-unit-container clearfix">
+							{{#each learner.availability.thu}}
+								<div class="availability-picker--time-unit {{#if this.hourMark}}hour{{/if}} {{#if this.active}}active{{/if}} {{this.markerType}}" >
+									<div class="availability-picker--time-unit--time-label start">
+										{{this.start.hour}}:{{this.start.minute}}
+									</div>
+									<div class="availability-picker--time-unit--time-label default">
+										{{this.start.hour}}:{{this.start.minute}}
+									</div>
+									<div class="availability-picker--time-unit--time-label end">
+										{{this.end.hour}}:{{this.end.minute}}
+									</div>
+								</div>
+							{{/each}}
+							</div>
+							<div class="availability-picker--all-day-toggle">
+								<label>
+						          	<input class="icheck" type="checkbox"> ALL-DAY
+						        </label>
+							</div>
+						</div>
+						<div class="availability-picker clearfix" id="availability-picker--fri">
+							<div class="availability-picker--date-label">
+								FRI
+							</div>
+							<div class="availability-picker--time-unit-container clearfix">
+							{{#each learner.availability.fri}}
+								<div class="availability-picker--time-unit {{#if this.hourMark}}hour{{/if}} {{#if this.active}}active{{/if}} {{this.markerType}}" >
+									<div class="availability-picker--time-unit--time-label start">
+										{{this.start.hour}}:{{this.start.minute}}
+									</div>
+									<div class="availability-picker--time-unit--time-label default">
+										{{this.start.hour}}:{{this.start.minute}}
+									</div>
+									<div class="availability-picker--time-unit--time-label end">
+										{{this.end.hour}}:{{this.end.minute}}
+									</div>
+								</div>
+							{{/each}}
+							</div>
+							<div class="availability-picker--all-day-toggle">
+								<label>
+						          	<input class="icheck" type="checkbox"> ALL-DAY
+						        </label>
+							</div>
+						</div>
+						<div class="availability-picker clearfix" id="availability-picker--sat">
+							<div class="availability-picker--date-label">
+								SAT
+							</div>
+							<div class="availability-picker--time-unit-container clearfix">
+							{{#each learner.availability.sat}}
+								<div class="availability-picker--time-unit {{#if this.hourMark}}hour{{/if}} {{#if this.active}}active{{/if}} {{this.markerType}}" >
+									<div class="availability-picker--time-unit--time-label start">
+										{{this.start.hour}}:{{this.start.minute}}
+									</div>
+									<div class="availability-picker--time-unit--time-label default">
+										{{this.start.hour}}:{{this.start.minute}}
+									</div>
+									<div class="availability-picker--time-unit--time-label end">
+										{{this.end.hour}}:{{this.end.minute}}
+									</div>
+								</div>
+							{{/each}}
+							</div>
+							<div class="availability-picker--all-day-toggle">
+								<label>
+						          	<input class="icheck" type="checkbox"> ALL-DAY
+						        </label>
+							</div>
+						</div>
+						<div class="availability-picker clearfix" id="availability-picker--sun">
+							<div class="availability-picker--date-label">
+								SUN
+							</div>
+							<div class="availability-picker--time-unit-container clearfix">
+							{{#each learner.availability.sun}}
+								<div class="availability-picker--time-unit {{#if this.hourMark}}hour{{/if}} {{#if this.active}}active{{/if}} {{this.markerType}}" >
+									<div class="availability-picker--time-unit--time-label start">
+										{{this.start.hour}}:{{this.start.minute}}
+									</div>
+									<div class="availability-picker--time-unit--time-label default">
+										{{this.start.hour}}:{{this.start.minute}}
+									</div>
+									<div class="availability-picker--time-unit--time-label end">
+										{{this.end.hour}}:{{this.end.minute}}
+									</div>
+								</div>
+							{{/each}}
+							</div>
+							<div class="availability-picker--all-day-toggle">
+								<label>
+						          	<input class="icheck" type="checkbox"> ALL-DAY
+						        </label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div role="tabpanel" class="tab-pane" id="learner-notes">
+				<div class="container-fluid">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-sm-8">
+								<h6>LESSON DETAILS</h6>
+								<hr/>
+								<div class="row">
+									<div class="col-sm-16">
+										<div class="form-group">
+											<label for="pickupArea">Pick up area</label>
+											<input type="text" class="form-control" id="firstName" placeholder="e.g Cabramatta">
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-sm-8">
+										<div class="form-group">
+											<label>
+									          	<input class="icheck" id="log-book-check" type="checkbox"> &nbsp;&nbsp; Log-book?
+									        </label>
+										</div>
+									</div>
+									<div class="col-sm-8">
+										<div class="form-group">
+											<label>
+									          	<input class="icheck" id="holiday-check" type="checkbox"> &nbsp;&nbsp; On Holiday?
+									        </label>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-8">
+								<h6>NOTES</h6>
+								<hr/>
+								<div class="row">
+									<div class="col-sm-16">
+										<label for="expiry">Notes</label>
+										<div class="form-group">
+											<textarea class="form-control" rows="10">
+											</textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>	
+	</div>
+</template>

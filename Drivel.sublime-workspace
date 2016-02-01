@@ -1,0 +1,642 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"pad",
+				"padding"
+			],
+			[
+				"back",
+				"background-color"
+			],
+			[
+				"tex",
+				"text-transform"
+			],
+			[
+				"Chara",
+				"CharacterTypes"
+			],
+			[
+				"se",
+				"selectingJob"
+			],
+			[
+				"job",
+				"jobDescriptions"
+			],
+			[
+				"s",
+				"speed     (num) [E]"
+			],
+			[
+				"backgro",
+				"background-size"
+			],
+			[
+				"myCrew",
+				"myCrewSecurity"
+			],
+			[
+				"ma",
+				"manoeuvre"
+			],
+			[
+				"si",
+				"sideCreator    (obj) [C]"
+			],
+			[
+				"side",
+				"sideCreator (obj) [C]"
+			],
+			[
+				"box-",
+				"box-shadow"
+			],
+			[
+				"Ac",
+				"Activities  (obj) [C]"
+			],
+			[
+				"text",
+				"text-align"
+			],
+			[
+				"batt",
+				"battleId1 (?) [S]"
+			],
+			[
+				"con",
+				"controller (?)   [C]"
+			],
+			[
+				"inli",
+				"inline-block"
+			],
+			[
+				"di",
+				"display"
+			],
+			[
+				"tetx",
+				"text-align"
+			],
+			[
+				"tet",
+				"text-align"
+			],
+			[
+				"te",
+				"text-align"
+			],
+			[
+				"d",
+				"display"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "drivel-app/app/client/templates/new/new.html",
+			"settings":
+			{
+				"buffer_size": 3645,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "var assert = require(\"assert\");\nvar path = require(\"path\");\nvar stream = require(\"stream\");\nvar fs = require(\"fs\");\nvar net = require(\"net\");\nvar tty = require(\"tty\");\nvar vm = require(\"vm\");\nvar _ = require(\"underscore\");\nvar INFO_FILE_MODE = 0600; // Only the owner can read or write.\nvar EXITING_MESSAGE =\n  // Exported so that ./client.js can know what to expect.\n  exports.EXITING_MESSAGE = \"Shell exiting...\";\n\nvar Promise = require(\"meteor-promise\");\n// Only require(\"fibers\") if somehow Promise.Fiber is not yet defined.\nPromise.Fiber = Promise.Fiber || require(\"fibers\");\n\n// Invoked by the server process to listen for incoming connections from\n// shell clients. Each connection gets its own REPL instance.\nexports.listen = function listen(shellDir) {\n  function callback() {\n    new Server(shellDir).listen();\n  }\n\n  // If the server is still in the very early stages of starting up,\n  // Meteor.startup may not available yet.\n  if (typeof Meteor === \"object\") {\n    Meteor.startup(callback);\n  } else if (typeof __meteor_bootstrap__ === \"object\") {\n    var hooks = __meteor_bootstrap__.startupHooks;\n    if (hooks) {\n      hooks.push(callback);\n    } else {\n      // As a fallback, just call the callback asynchronously.\n      process.nextTick(callback);\n    }\n  }\n};\n\n// Disabling the shell causes all attached clients to disconnect and exit.\nexports.disable = function disable(shellDir) {\n  try {\n    // Replace info.json with a file that says the shell server is\n    // disabled, so that any connected shell clients will fail to\n    // reconnect after the server process closes their sockets.\n    fs.writeFileSync(\n      getInfoFile(shellDir),\n      JSON.stringify({\n        status: \"disabled\",\n        reason: \"Shell server has shut down.\"\n      }) + \"\\n\",\n      { mode: INFO_FILE_MODE }\n    );\n  } catch (ignored) {}\n};\n\nfunction Server(shellDir) {\n  var self = this;\n  assert.ok(self instanceof Server);\n\n  self.shellDir = shellDir;\n  self.key = Math.random().toString(36).slice(2);\n\n  self.server = net.createServer(function(socket) {\n    self.onConnection(socket);\n  }).on(\"error\", function(err) {\n    console.error(err.stack);\n  });\n}\n\nvar Sp = Server.prototype;\n\nSp.listen = function listen() {\n  var self = this;\n  var infoFile = getInfoFile(self.shellDir);\n\n  fs.unlink(infoFile, function() {\n    self.server.listen(0, \"127.0.0.1\", function() {\n      fs.writeFileSync(infoFile, JSON.stringify({\n        status: \"enabled\",\n        port: self.server.address().port,\n        key: self.key\n      }) + \"\\n\", {\n        mode: INFO_FILE_MODE\n      });\n    });\n  });\n};\n\nSp.onConnection = function onConnection(socket) {\n  var self = this;\n  var dataSoFar = \"\";\n\n  // Make sure this function doesn't try to write anything to the socket\n  // after it has been closed.\n  socket.on(\"close\", function() {\n    socket = null;\n  });\n\n  // If communication is not established within 1000ms of the first\n  // connection, forcibly close the socket.\n  var timeout = setTimeout(function() {\n    if (socket) {\n      socket.removeAllListeners(\"data\");\n      socket.end(EXITING_MESSAGE + \"\\n\");\n    }\n  }, 1000);\n\n  // Let connecting clients configure certain REPL options by sending a\n  // JSON object over the socket. For example, only the client knows\n  // whether it's running a TTY or an Emacs subshell or some other kind of\n  // terminal, so the client must decide the value of options.terminal.\n  socket.on(\"data\", function onData(buffer) {\n    // Just in case the options JSON comes in fragments.\n    dataSoFar += buffer.toString(\"utf8\");\n\n    try {\n      var options = JSON.parse(dataSoFar);\n    } finally {\n      if (! _.isObject(options)) {\n        return; // Silence any parsing exceptions.\n      }\n    }\n\n    if (socket) {\n      socket.removeListener(\"data\", onData);\n    }\n\n    if (options.key !== self.key) {\n      if (socket) {\n        socket.end(EXITING_MESSAGE + \"\\n\");\n      }\n      return;\n    }\n    delete options.key;\n\n    clearTimeout(timeout);\n\n    // Immutable options.\n    _.extend(options, {\n      input: socket,\n      output: socket,\n      eval: evalCommand\n    });\n\n    // Overridable options.\n    _.defaults(options, {\n      prompt: \"> \",\n      terminal: true,\n      useColors: true,\n      useGlobal: true,\n      ignoreUndefined: true,\n    });\n\n    self.startREPL(options);\n  });\n};\n\nSp.startREPL = function startREPL(options) {\n  var self = this;\n\n  if (! options.output.columns) {\n    // The REPL's tab completion logic assumes process.stdout is a TTY,\n    // and while that isn't technically true here, we can get tab\n    // completion to behave correctly if we fake the .columns property.\n    options.output.columns = getTerminalWidth();\n  }\n\n  // Make sure this function doesn't try to write anything to the output\n  // stream after it has been closed.\n  options.output.on(\"close\", function() {\n    options.output = null;\n  });\n\n  var repl = self.repl = require(\"repl\").start(options);\n\n  // History persists across shell sessions!\n  self.initializeHistory();\n\n  // Save the global `_` object in the server.  This is probably defined by the\n  // underscore package.  It is unlikely to be the same object as the `var _ =\n  // require('underscore')` in this file!\n  var originalUnderscore = repl.context._;\n\n  Object.defineProperty(repl.context, \"_\", {\n    // Force the global _ variable to remain bound to underscore.\n    get: function () { return originalUnderscore; },\n\n    // Expose the last REPL result as __ instead of _.\n    set: function(lastResult) {\n      repl.context.__ = lastResult;\n    },\n\n    enumerable: true,\n\n    // Allow this property to be (re)defined more than once (e.g. each\n    // time the server restarts).\n    configurable: true\n  });\n\n  // Use the same `require` function and `module` object visible to the\n  // shell.js module.\n  repl.context.require = require;\n  repl.context.module = module;\n  repl.context.repl = repl;\n\n  // Some improvements to the existing help messages.\n  repl.commands[\".break\"].help =\n    \"Terminate current command input and display new prompt\";\n  repl.commands[\".exit\"].help = \"Disconnect from server and leave shell\";\n  repl.commands[\".help\"].help = \"Show this help information\";\n\n  // When the REPL exits, signal the attached client to exit by sending it\n  // the special EXITING_MESSAGE.\n  repl.on(\"exit\", function() {\n    if (options.output) {\n      options.output.write(EXITING_MESSAGE + \"\\n\");\n      options.output.end();\n    }\n  });\n\n  // When the server process exits, end the output stream but do not\n  // signal the attached client to exit.\n  process.on(\"exit\", function() {\n    if (options.output) {\n      options.output.end();\n    }\n  });\n\n  // This Meteor-specific shell command rebuilds the application as if a\n  // change was made to server code.\n  repl.defineCommand(\"reload\", {\n    help: \"Restart the server and the shell\",\n    action: function() {\n      process.exit(0);\n    }\n  });\n};\n\nfunction getInfoFile(shellDir) {\n  return path.join(shellDir, \"info.json\");\n}\nexports.getInfoFile = getInfoFile;\n\nfunction getHistoryFile(shellDir) {\n  return path.join(shellDir, \"history\");\n}\n\nfunction getTerminalWidth() {\n  try {\n    // Inspired by https://github.com/TooTallNate/ttys/blob/master/index.js\n    var fd = fs.openSync(\"/dev/tty\", \"r\");\n    assert.ok(tty.isatty(fd));\n    var ws = new tty.WriteStream(fd);\n    ws.end();\n    return ws.columns;\n  } catch (fancyApproachWasTooFancy) {\n    return 80;\n  }\n}\n\n// Shell commands need to be executed in a Fiber in case they call into\n// code that yields. Using a Promise is an even better idea, since it runs\n// its callbacks in Fibers drawn from a pool, so the Fibers are recycled.\nvar evalCommandPromise = Promise.resolve();\n\nfunction evalCommand(command, context, filename, callback) {\n  if (Package.ecmascript) {\n    var noParens = stripParens(command);\n    if (noParens !== command) {\n      var classMatch = /^\\s*class\\s+(\\w+)/.exec(noParens);\n      if (classMatch && classMatch[1] !== \"extends\") {\n        // If the command looks like a named ES2015 class, we remove the\n        // extra layer of parentheses added by the REPL so that the\n        // command will be evaluated as a class declaration rather than as\n        // a named class expression. Note that you can still type (class A\n        // {}) explicitly to evaluate a named class expression. The REPL\n        // code that calls evalCommand handles named function expressions\n        // similarly (first with and then without parentheses), but that\n        // code doesn't know about ES2015 classes, which is why we have to\n        // handle them here.\n        command = noParens;\n      }\n    }\n\n    try {\n      command = Package.ecmascript.ECMAScript.compileForShell(command);\n    } catch (error) {\n      callback(error);\n      return;\n    }\n  }\n\n  try {\n    var script = new vm.Script(command, {\n      filename: filename,\n      displayErrors: false\n    });\n  } catch (parseError) {\n    callback(parseError);\n    return;\n  }\n\n  evalCommandPromise.then(function () {\n    callback(null, script.runInThisContext());\n  }).catch(callback);\n}\n\nfunction stripParens(command) {\n  if (command.charAt(0) === \"(\" &&\n      command.charAt(command.length - 1) === \")\") {\n    return command.slice(1, command.length - 1);\n  }\n  return command;\n}\n\n// This function allows a persistent history of shell commands to be saved\n// to and loaded from .meteor/local/shell-history.\nSp.initializeHistory = function initializeHistory() {\n  var self = this;\n  var rli = self.repl.rli;\n  var historyFile = getHistoryFile(self.shellDir);\n  var historyFd = fs.openSync(historyFile, \"a+\");\n  var historyLines = fs.readFileSync(historyFile, \"utf8\").split(\"\\n\");\n  var seenLines = Object.create(null);\n\n  if (! rli.history) {\n    rli.history = [];\n    rli.historyIndex = -1;\n  }\n\n  while (rli.history && historyLines.length > 0) {\n    var line = historyLines.pop();\n    if (line && /\\S/.test(line) && ! seenLines[line]) {\n      rli.history.push(line);\n      seenLines[line] = true;\n    }\n  }\n\n  rli.addListener(\"line\", function(line) {\n    if (historyFd >= 0 && /\\S/.test(line)) {\n      fs.writeSync(historyFd, line + \"\\n\");\n    }\n  });\n\n  self.repl.on(\"exit\", function() {\n    fs.closeSync(historyFd);\n    historyFd = -1;\n  });\n};\n",
+			"file": "drivel-app/build/bundle/programs/server/shell-server.js",
+			"file_size": 10214,
+			"file_write_time": 130983762350000000,
+			"settings":
+			{
+				"buffer_size": 10214,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Application production builds can go in this directory. To build your\napplication for staging or production run this command:\n\n> iron build\n",
+			"file": "drivel-app/build/README",
+			"file_size": 140,
+			"file_write_time": 130983750420000000,
+			"settings":
+			{
+				"buffer_size": 140,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "drivel-app/app/client/templates/learners/learners.html",
+			"settings":
+			{
+				"buffer_size": 136,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "drivel-app/app/.meteor/versions",
+			"settings":
+			{
+				"buffer_size": 1503,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 107.0,
+		"last_filter": "INsta",
+		"selected_items":
+		[
+			[
+				"INsta",
+				"Package Control: Install Package"
+			],
+			[
+				"Insta",
+				"Package Control: Advanced Install Package"
+			]
+		],
+		"width": 575.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/apham/development/Drivel",
+		"/Users/apham/development/Drivel/drivel-app",
+		"/Users/apham/development/Drivel/drivel-app/app/.meteor/local/isopacks",
+		"/Users/apham/development/Drivel/drivel-app/app/.meteor/local/plugin-cache/cloudspider_icheck/1.0.2",
+		"/Users/apham/development/Drivel/drivel-app/app/.meteor/local/plugin-cache/coffeescript",
+		"/Users/apham/development/Drivel/drivel-app/app/client/collections",
+		"/Users/apham/development/Drivel/drivel-app/app/client/lib",
+		"/Users/apham/development/Drivel/drivel-app/app/client/stylesheets",
+		"/Users/apham/development/Drivel/drivel-app/app/client/templates",
+		"/Users/apham/development/Drivel/drivel-app/app/client/templates/app",
+		"/Users/apham/development/Drivel/drivel-app/app/client/templates/home",
+		"/Users/apham/development/Drivel/drivel-app/app/client/templates/layouts",
+		"/Users/apham/development/Drivel/drivel-app/app/client/templates/layouts/master_layout",
+		"/Users/apham/development/Drivel/drivel-app/app/client/templates/learners",
+		"/Users/apham/development/Drivel/drivel-app/app/client/templates/new",
+		"/Users/apham/development/Drivel/drivel-app/config",
+		"/Users/apham/development/pick-a-side-brah/.meteor",
+		"/Users/apham/development/pick-a-side-brah/lib"
+	],
+	"file_history":
+	[
+		"/Users/apham/development/Drivel/drivel-app/app/client/stylesheets/main.less",
+		"/Users/apham/development/Drivel/drivel-app/app/client/stylesheets/drivel-app.import.less",
+		"/Users/apham/development/Drivel/drivel-app/app/client/templates/home/home.html",
+		"/Users/apham/development/Drivel/drivel-app/app/client/main.js",
+		"/Users/apham/development/Drivel/drivel-app/app/client/templates/new/new.js",
+		"/Users/apham/development/Drivel/drivel-app/app/client/stylesheets/components/datepicker.import.less",
+		"/Users/apham/development/Drivel/drivel-app/app/client/stylesheets/components/switchery.import.less",
+		"/Users/apham/development/Drivel/drivel-app/app/client/stylesheets/components/typography.import.less",
+		"/Users/apham/development/Drivel/drivel-app/app/client/stylesheets/metrize-icon.import.less",
+		"/Users/apham/development/Drivel/drivel-app/app/client/templates/app/main_nav.html",
+		"/Users/apham/development/Drivel/drivel-app/app/client/templates/layouts/master_layout/master_layout.html",
+		"/Users/apham/development/Drivel/drivel-app/app/client/stylesheets/components/navbar.import.less",
+		"/Users/apham/development/Drivel/drivel-app/app/lib/routes.js",
+		"/Users/apham/development/Drivel/drivel-app/app/client/templates/learners/learners.css",
+		"/Users/apham/development/Drivel/drivel-app/app/client/stylesheets/feather-icon.import.less",
+		"/Users/apham/development/Drivel/drivel-app/app/client/stylesheets/variables.import.less",
+		"/Users/apham/development/Drivel/drivel-app/app/client/stylesheets/theme.min.css",
+		"/Users/apham/Desktop/feather-v1.1/webfont/feather-webfont/feather.css",
+		"/Users/apham/development/Drivel/drivel-app/app/client/stylesheets/navbar.less",
+		"/Users/apham/development/caravan-game/app/index.html",
+		"/Users/apham/development/caravan-game/app/game/game.html",
+		"/Users/apham/development/caravan-game/app/less/game.game--action-view.less",
+		"/Users/apham/development/caravan-game/app/app.js",
+		"/Users/apham/development/caravan-game/app/app.less",
+		"/Users/apham/development/pick-a-side-brah/client/main.html",
+		"/Users/apham/development/caravan-game/Gruntfile.js",
+		"/Users/apham/development/caravan-game/app/app.css.map",
+		"/Users/apham/development/hl-my-account/common/scripts/point-components/utils.js",
+		"/Users/apham/development/caravan-game/app/less/finess.less",
+		"/Users/apham/development/caravan-game/app/game/game_test.js",
+		"/Users/apham/development/caravan-game/app/game/game.js",
+		"/Users/apham/development/caravan-game/app/less/helpers.less",
+		"/Users/apham/development/hl-my-account/Gruntfile.js",
+		"/Users/apham/development/caravan-game/app/scripts/app.js",
+		"/Users/apham/Documents/Lời/Pháo hoa đêm hè",
+		"/Users/apham/Library/Containers/com.apple.mail/Data/Library/Mail Downloads/F7397A84-C092-4428-9ED0-81417C74A68D/HL_SI_campaign_Jan16/1452568646.html",
+		"/Users/apham/Documents/Lời/Bài chưa đặt tên 5",
+		"/Users/apham/development/pick-a-side-brah/important-details",
+		"/Users/apham/development/pick-a-side-brah/client/templates/application/layout.html",
+		"/Users/apham/development/pick-a-side-brah/client/templates/application/footer_nav.html",
+		"/Users/apham/development/pick-a-side-brah/client/templates/application/home.html",
+		"/Users/apham/development/pick-a-side-brah/client/templates/application/feed_item.html",
+		"/Users/apham/development/pick-a-side-brah/client/templates/application/home.js",
+		"/Users/apham/development/pick-a-side-brah/client/templates/application/login.html",
+		"/Users/apham/development/pick-a-side-brah/client/stylesheets/login.import.less",
+		"/Users/apham/development/pick-a-side-brah/client/stylesheets/home.import.less",
+		"/Users/apham/development/pick-a-side-brah/client/stylesheets/animate.import.less",
+		"/Users/apham/development/pick-a-side-brah/client/stylesheets/navbar.import.less",
+		"/Users/apham/development/pick-a-side-brah/server/functions/myAccount.js",
+		"/Users/apham/development/pick-a-side-brah/server/functions/voting.js",
+		"/Users/apham/development/pick-a-side-brah/server/functions/commenting.js",
+		"/Users/apham/development/pick-a-side-brah/client/stylesheets/modal.import.less",
+		"/Users/apham/development/pick-a-side-brah/lib/routes/routes.js",
+		"/Users/apham/development/pick-a-side-brah/lib/routes/image.js",
+		"/Users/apham/development/pick-a-side-brah/client/templates/application/settings.html",
+		"/Users/apham/development/pick-a-side-brah/client/templates/users/user_page.html",
+		"/Users/apham/development/pick-a-side-brah/client/stylesheets/user.import.less",
+		"/Users/apham/development/pick-a-side-brah/lib/collections/activities.js",
+		"/Users/apham/development/pick-a-side-brah/client/stylesheets/activity.import.less",
+		"/Users/apham/development/pick-a-side-brah/client/stylesheets/style.less",
+		"/Users/apham/development/pick-a-side-brah/server/publications.js",
+		"/Users/apham/development/pick-a-side-brah/client/templates/users/user_page.js",
+		"/Users/apham/development/pick-a-side-brah/client/templates/application/login.js",
+		"/Users/apham/development/pick-a-side-brah/client/templates/activities/activity_list.html",
+		"/Users/apham/development/pick-a-side-brah/client/templates/activities/activity_list.js",
+		"/Users/apham/development/pick-a-side-brah/client/templates/activities/activity_item.html",
+		"/Users/apham/development/pick-a-side-brah/client/templates/comments/comment_item.html",
+		"/Users/apham/development/pick-a-side-brah/client/templates/comments/comment_item.js",
+		"/Users/apham/development/pick-a-side-brah/client/stylesheets/comment.import.less",
+		"/Users/apham/development/pick-a-side-brah/client/templates/activities/activity_item.js",
+		"/Users/apham/development/pick-a-side-brah/client/main.js",
+		"/Users/apham/development/pick-a-side-brah/client/templates/battles/battle_item.html",
+		"/Users/apham/development/pick-a-side-brah/client/stylesheets/side.import.less",
+		"/Users/apham/development/pick-a-side-brah/server/functions/battles.js",
+		"/Users/apham/development/pick-a-side-brah/client/templates/dropzone.js",
+		"/Users/apham/development/pick-a-side-brah/lib/router.js",
+		"/Users/apham/development/pick-a-side-brah/lib/config.js",
+		"/Users/apham/development/pick-a-side-brah/client/templates/battles/battles_list.js",
+		"/Users/apham/development/pick-a-side-brah/client/templates/battles/battles_list.html",
+		"/Users/apham/development/pick-a-side-brah/lib/collections/battles.js",
+		"/Users/apham/development/pick-a-side-brah/lib/collections/sides.js",
+		"/Users/apham/development/pick-a-side-brah/lib/collections/comments.js",
+		"/Users/apham/development/pick-a-side-brah/server/functions.js",
+		"/Users/apham/development/pick-a-side-brah/server/social-config.js",
+		"/Users/apham/development/pick-a-side-brah/client/templates/application/not_found.html",
+		"/Users/apham/development/pick-a-side-brah/client/templates/includes/loading.html",
+		"/Users/apham/development/pick-a-side-brah/client/templates/sides/side.html",
+		"/Users/apham/development/pick-a-side-brah/client/templates/battles/battle_page.js",
+		"/Users/apham/development/pick-a-side-brah/client/templates/battles/battle_item.js",
+		"/Users/apham/development/pick-a-side-brah/client/stylesheets/facebook.import.less",
+		"/Users/apham/development/pick-a-side-brah/client/templates/sides/side.js",
+		"/Users/apham/development/pick-a-side-brah/server/fixtures.js",
+		"/Users/apham/development/pick-a-side-brah/server/kadira.js",
+		"/Users/apham/development/pick-a-side-brah/client/stylesheets/side-splitter.import.less",
+		"/Users/apham/development/pick-a-side-brah/client/stylesheets/typography.import.less",
+		"/Users/apham/development/pick-a-side-brah/client/stylesheets/battle.import.less",
+		"/Users/apham/development/pick-a-side-brah/client/templates/battles/battle_page.html",
+		"/Users/apham/development/pick-a-side-brah/client/stylesheets/variables.import.less",
+		"/Users/apham/development/pick-a-side-brah/lib/collections/users.js",
+		"/Users/apham/development/versus/app/public/stylesheets/components/split-box.less",
+		"/Users/apham/development/pick-a-side-brah/client/stylesheets/mixins.import.less",
+		"/Users/apham/development/versus/app/public/stylesheets/common.less",
+		"/Users/apham/development/pick-a-side-brah/client/templates/battles/battle_item_detail.html",
+		"/Users/apham/development/pick-a-side-brah/server/routes.js",
+		"/Users/apham/development/pick-a-side-brah/pick-a-side-brah.html",
+		"/Users/apham/development/pick-a-side-brah/client/templates/battles/side.html",
+		"/Users/apham/development/pick-a-side-brah/client/templates/battles_list.js",
+		"/Users/apham/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+			"/Users/apham/development/pick-a-side-brah",
+			"/Users/apham/development/pick-a-side-brah/client/templates"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"pro",
+			"user",
+			"calendar",
+			"justify",
+			"list",
+			"#E55757",
+			"#435F7A",
+			"destination",
+			"gameState",
+			"gameStates",
+			"gameState",
+			"game--action-view--job-board--job-details--rewards",
+			"MyCharacter",
+			"myCrewSpeed",
+			"background",
+			"game--action-view--job-details--content {",
+			" {",
+			"pic",
+			"item {",
+			"ngAnimate'",
+			"ngAnimate",
+			"ng-animate'",
+			"ng-animate",
+			"requirement.",
+			"\n        ",
+			"Battles",
+			"\n		battleId : '',",
+			"profile",
+			"btn-default",
+			"Battles.findOne",
+			"sideA: {\n		side: 'a',",
+			"sideB: {\n		side: 'b',",
+			"sideB: {",
+			"sideA: {",
+			"fadeInUp",
+			"\"",
+			"color",
+			"Posts"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"requirements.",
+			"",
+			"Battles.update",
+			"sideA: {\n		battleId : '',\n		side: 'a',",
+			"sideB: {\n		battleId : '',\n		side: 'b',",
+			"sideB: {\n		side: 'b',",
+			"sideA: {\n		side: 'a',",
+			"sideA: {\n		side: 'a'",
+			"'",
+			"Battles"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"folders":
+	[
+		{
+			"path": "/Users/apham/development/Drivel"
+		},
+		{
+			"path": "/Users/apham/development/pick-a-side-brah"
+		}
+	],
+	"groups":
+	[
+		{
+			"selected": 2,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "drivel-app/app/client/templates/new/new.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3645,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								3645
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "drivel-app/build/bundle/programs/server/shell-server.js",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 10214,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "drivel-app/build/README",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 140,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								140,
+								140
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "drivel-app/app/client/templates/learners/learners.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 136,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								136
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "drivel-app/app/.meteor/versions",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1503,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								290,
+								290
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "",
+	"replace":
+	{
+		"height": 42.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 294.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

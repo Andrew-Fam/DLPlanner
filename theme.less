@@ -1,0 +1,86 @@
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,600);
+@import url(https://fonts.googleapis.com/css?family=Dosis:400,500,600);
+body {
+	-webkit-font-smoothing: antialiased;
+  	-moz-osx-font-smoothing: grayscale;
+}
+
+input,
+textarea,
+select{
+  border: none!important;
+  border-radius: 25px;
+  .well & {
+  	background-color: #fff;
+  }
+  
+}
+
+.form-control {
+	border-radius: 25px;
+}
+
+.pagination {
+	> li {
+      	border-radius: 100px;
+    	> a {
+          border-radius: 100px;
+          margin: 0 0.5em;
+          border: none;
+          width: 2.5em;
+          height: 2.5em;
+          line-height: 1.6em;
+          text-indent: 0.075em;
+          text-align: center;
+        }
+      
+      &.active {
+      	> a {
+        	border: none;
+        }
+      }
+      
+      &:last-child,
+      &:first-child {
+        > a {
+          background-color: transparent!important;
+        }
+      	
+      }
+    }
+	&.pagination-lg {
+    	> li {
+        	> a {
+            	line-height: 1.4em;
+         		text-indent: 0.05em;
+            }
+        }
+    }
+}
+
+.pager {
+	> li {
+    	> a {
+        	
+          border: none;
+        
+        }
+      
+      	&:hover {
+        	> a {
+            	color: #435F7A;
+            }
+        }
+    }
+}
+
+.panel { 
+  border: none!important;
+  > .panel-heading {
+    border-radius: 0px;
+  }
+  
+  &.panel-default {
+  	border: none;
+  }
+}
