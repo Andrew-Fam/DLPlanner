@@ -1,0 +1,39 @@
+.pagination > .active > a, 
+.pagination > .active > a:focus, 
+.pagination > .active > a:hover, 
+.pagination > .active > span, 
+.pagination > .active > span:focus, 
+.pagination > .active > span:hover {
+    z-index: 2;
+    color: #7BB724;
+    background-color: #2C2C2C;
+    border-color: #435f7a;
+    cursor: default;
+    box-shadow: 0px 0px 1px 1px #7BB724;
+}
+
+.pagination-cont {
+	.clearfix();
+}
+
+.pagination {
+	margin: 15px 0px;
+	float: left;
+	> li {
+		// border-radius: 0px;
+		margin: 0;
+		> a {
+			// border-radius: 0px;
+			color: #a1a1a1;
+			font-size: 12px;
+			text-indent: 0px;
+			background-color: transparent;
+			&:hover,
+			&:active,
+			&:focus {
+				color: #fff;
+				background-color: transparent;
+			}
+		}
+	}
+}

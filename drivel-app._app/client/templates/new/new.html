@@ -11,19 +11,24 @@
 				&nbsp;
 			</div>
 			<h5 class="pull-left">
-				<a href="tel:{{learner.phone}}">
-					<i class="glyphicon glyphicon-earphone"></i>
+				<a class="page-title--link" href="tel:{{learner.phone}}">
+					<i class="fa fa-fw fa-phone"></i>
 					{{learner.phone}}
 				</a>
 			</h5>
-			<button class="btn btn-primary btn-md pull-right">
+			<button id="save-new-learner" class="btn btn-primary btn-md pull-right">
 				&nbsp;&nbsp;&nbsp;SAVE&nbsp;&nbsp;&nbsp;
+			</button>
+			<button id="save-new-learner" class="btn btn-default btn-md pull-right">
+				&nbsp;&nbsp;&nbsp;Reset&nbsp;&nbsp;&nbsp;
 			</button>
 		</div>
 		<ul class="nav nav-tabs page-tabs" role="tablist">
 		    <li role="presentation" class="active"><a href="#personal-id" aria-controls="home" role="tab" data-toggle="tab">Personal ID</a></li><!--
 		    --><li role="presentation" class=""><a href="#learner-availability" aria-controls="profile" role="tab" data-toggle="tab">Availability</a></li><!--
-		    --><li role="presentation" class=""><a href="#learner-notes" aria-controls="profile" role="tab" data-toggle="tab">Learner's Notes</a></li>
+		    --><li role="presentation" class=""><a href="#learner-notes" aria-controls="profile" role="tab" data-toggle="tab">Learner's Notes</a></li><!--
+		    --><!-- <li role="presentation" class=""><a href="#learner-lesson-history" aria-controls="profile" role="tab" data-toggle="tab">Lesson History</a></li> --><!--
+		    --><!-- <li role="presentation" class=""><a href="#learner-payment-history" aria-controls="profile" role="tab" data-toggle="tab">Payments</a></li> -->
 		</ul>
 		<br/>
 		<div class="tab-content">
@@ -38,13 +43,13 @@
 									<div class="col-sm-8">
 										<div class="form-group">
 											<label for="fullName">Full Name</label>
-											<input type="text" class="form-control" id="fullName" placeholder="Full Name">
+											<input type="text" class="form-control" id="fullName" placeholder="Enter full name">
 										</div>
 									</div>
 									<div class="col-sm-8">
 										<div class="form-group">
 											<label for="alias">Alias</label>
-											<input type="text" class="form-control" id="alias" placeholder="Alias">
+											<input type="text" class="form-control" id="alias" placeholder="e.g Tuan City">
 										</div>
 									</div>
 								</div>
@@ -52,32 +57,38 @@
 									<div class="col-sm-8">
 										<div class="form-group">
 											<label for="dob">Date of Birth</label>
-											<input type="text" class="form-control date-picker" id="dob" placeholder="">
+											<input type="text" class="form-control date-picker" id="dob" name="dob" placeholder="Pick a date">
 										</div>
 									</div>
 									<div class="col-sm-8">
 										<div class="form-group">
 											<label for="phone">Phone</label>
-											<input type="text" class="form-control" id="phone" placeholder="Phone">
+											<input type="text" class="form-control" id="phone" >
 										</div>
 									</div>
 								</div>
 								<div class="row">
-									<div class="col-sm-16">
+									<div class="col-sm-8">
 										<div class="form-group">
 											<label for="address">Address</label>
-											<input type="text" class="form-control" id="address" placeholder="Address">
+											<input type="text" class="form-control" id="address" placeholder="Street Address">
+										</div>
+									</div>
+									<div class="col-sm-8">
+										<div class="form-group">
+											<label for="suburb">Suburb</label>
+											<input type="text" class="form-control" id="suburb" placeholder="Suburb">
 										</div>
 									</div>
 								</div>
 							</div>
-							<div class="col-sm-8">
+							<div class="col-sm-7 col-sm-offset-1">
 								<div class="clearfix">
 									<h6 class="pull-left">
 										LICENSE
 									</h6>
-									<label class="pull-right">
-							          	Aus. &nbsp;&nbsp;<input class="js-switch" id="international-license-check" type="checkbox"> &nbsp;&nbsp;Int.
+									<label class="pull-right section-header-switch">
+							          	Local &nbsp;&nbsp;<input class="js-switch" id="international-license-check" type="checkbox"> &nbsp;&nbsp;Int.
 							        </label>
 								</div>
 								<hr/>
@@ -85,7 +96,7 @@
 									<div class="col-sm-16">
 										<div class="form-group">
 											<label for="license-number">License Number</label>
-											<input type="text" class="form-control" id="license-number" placeholder="">
+											<input type="text" class="form-control" id="license-number" placeholder="Enter license number">
 										</div>
 									</div>
 								</div>
@@ -93,7 +104,7 @@
 									<div class="col-sm-16">
 										<div class="form-group">
 											<label for="card-number">Card Number</label>
-											<input type="text" class="form-control" id="card-number" placeholder="">
+											<input type="text" class="form-control" id="card-number" placeholder="Check back side of license">
 										</div>
 									</div>
 								</div>
@@ -101,7 +112,7 @@
 									<div class="col-sm-16">
 										<div class="form-group">
 											<label for="expiry">Expiry</label>
-											<input type="text" class="form-control date-picker" id="expiry" placeholder="">
+											<input type="text" class="form-control date-picker" id="expiry" name="expiry" placeholder="Pick a date">
 										</div>
 									</div>
 								</div>
@@ -134,7 +145,7 @@
 							</div>
 							<div class="availability-picker--all-day-toggle">
 								<label>
-						          	<input class="icheck" type="checkbox"> ALL-DAY
+						          	<input class="icheck availability-picker--all-day-toggle--input" type="checkbox" data-day-of-week="mon"> ALL-DAY
 						        </label>
 							</div>
 						</div>
@@ -159,7 +170,7 @@
 							</div>
 							<div class="availability-picker--all-day-toggle">
 								<label>
-						          	<input class="icheck" type="checkbox"> ALL-DAY
+						          	<input class="icheck availability-picker--all-day-toggle--input" type="checkbox" data-day-of-week="tue"> ALL-DAY
 						        </label>
 							</div>
 						</div>
@@ -184,7 +195,7 @@
 							</div>
 							<div class="availability-picker--all-day-toggle">
 								<label>
-						          	<input class="icheck" type="checkbox"> ALL-DAY
+						          	<input class="icheck availability-picker--all-day-toggle--input" type="checkbox" data-day-of-week="wed"> ALL-DAY
 						        </label>
 							</div>
 						</div>
@@ -209,7 +220,7 @@
 							</div>
 							<div class="availability-picker--all-day-toggle">
 								<label>
-						          	<input class="icheck" type="checkbox"> ALL-DAY
+						          	<input class="icheck availability-picker--all-day-toggle--input" type="checkbox" data-day-of-week="thu"> ALL-DAY
 						        </label>
 							</div>
 						</div>
@@ -234,7 +245,7 @@
 							</div>
 							<div class="availability-picker--all-day-toggle">
 								<label>
-						          	<input class="icheck" type="checkbox"> ALL-DAY
+						          	<input class="icheck availability-picker--all-day-toggle--input" type="checkbox" data-day-of-week="fri"> ALL-DAY
 						        </label>
 							</div>
 						</div>
@@ -259,7 +270,7 @@
 							</div>
 							<div class="availability-picker--all-day-toggle">
 								<label>
-						          	<input class="icheck" type="checkbox"> ALL-DAY
+						          	<input class="icheck availability-picker--all-day-toggle--input" type="checkbox" data-day-of-week="sat"> ALL-DAY
 						        </label>
 							</div>
 						</div>
@@ -284,7 +295,7 @@
 							</div>
 							<div class="availability-picker--all-day-toggle">
 								<label>
-						          	<input class="icheck" type="checkbox"> ALL-DAY
+						          	<input class="icheck availability-picker--all-day-toggle--input" type="checkbox" data-day-of-week="sun"> ALL-DAY
 						        </label>
 							</div>
 						</div>
@@ -328,10 +339,9 @@
 								<hr/>
 								<div class="row">
 									<div class="col-sm-16">
-										<label for="expiry">Notes</label>
 										<div class="form-group">
-											<textarea class="form-control" rows="10">
-											</textarea>
+											<label for="expiry">Notes</label>
+											<textarea class="form-control" id="notes" rows="10" placeholder="Learner's note"></textarea >
 										</div>
 									</div>
 								</div>

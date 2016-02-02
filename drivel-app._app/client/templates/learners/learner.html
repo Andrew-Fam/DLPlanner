@@ -1,0 +1,50 @@
+<template name="Learner">
+  <div class="learner-item">
+    {{#if needMoreDetails}}
+    <div class="learner-item--icon warning">
+      <i class="metrize-icon-exclamation">
+      </i>
+    </div>
+    {{else}}
+  	<div class="learner-item--icon">
+      <i class="metrize-icon-user">
+      </i>
+  	</div>
+    {{/if}}
+    <div class="learner-item--name">
+    	{{#if alias}}{{alias}}{{else}}{{fullName}}{{/if}}
+    </div>
+  	{{#if needMoreDetails}}
+  	<div class="learner-item--needs-more-details">
+  		This learner profile is incomplete.
+  	</div>
+    <button class="btn btn-default learner-item--update-profile-btn"> 
+      EDIT
+    </button>
+    {{else}}
+    <div class="learner-item--created">
+   	 	<label>
+    	Created
+    	</label>
+    	{{#if created_on}}{{at}}{{else}}unknown{{/if}}
+    </div>
+    <div class="clearfix">
+      <div class="learner-item--license">
+      	<label>
+      	License number
+      	</label>
+      	{{license.number}}
+      </div>
+      <div class="learner-item--phone">
+      	<label>
+      	Phone
+      	</label>
+      	{{phone}}
+      </div>
+    </div>
+    <button class="btn btn-default learner-item--view-profile-btn"> 
+      VIEW
+    </button>
+    {{/if}}
+  </div>
+</template>

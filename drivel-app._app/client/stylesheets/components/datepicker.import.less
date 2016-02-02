@@ -1,3 +1,103 @@
-.datepicker {
-	z-index: 1111;
+.picker__box {
+	background-color: #111111;
+	color: #c3c3c3;
+	border-color: transparent;
+	border-radius: 0px;
+	padding-bottom: 15px;
+	&:before {
+		content: "";
+		position: absolute;
+		display: block;
+		left: 0px;
+		top: 0px;
+		bottom: 0px;
+		right: 0px;
+		z-index: 1!important;
+		.opacity(0.1);
+		background-image: url(/pattern.png);
+	}
+	> * {
+		position: relative;
+		z-index: 2;
+	}
+
+	.picker__button--today, 
+	.picker__button--clear, 
+	.picker__button--close {
+		background-color: transparent;
+		border-color: transparent;
+		font-weight: 400;
+		letter-spacing: 0.025em;
+		color: #a1a1a1;
+		&:hover {
+			background-color: transparent;
+			border-color: transparent;
+			color: #fff;
+		}
+	}
+
+	.picker__select--month, 
+	.picker__select--year {
+		background-color: rgba(0,0,0,0.1);
+		padding-left: 25px;
+		padding-right: 25px;
+		border-color: transparent;
+	}
+
+	.picker__day--highlighted:hover, 
+	.picker--focused .picker__day--highlighted,
+	.picker__day.picker__day--infocus.picker__day--highlighted {
+		background-color: rgba(0,0,0,0.1);
+		color: #fff;
+		border: 1px solid #7bb724;
+		border-radius: 25px;
+	}
+
+	.picker__day--infocus:hover, .picker__day--outfocus:hover {
+		border-radius: 25px;
+		background-color: rgba(0,0,0,0.05);
+		color: #fff;
+	}
+
+	.picker__day.picker__day--infocus.picker__day--disabled,
+	.picker__day.picker__day--outfocus.picker__day--disabled {
+		background-color: transparent;
+		border-color: transparent;
+		color: #434343;
+		&:hover {
+			background-color: transparent;
+			border-color: transparent;
+		}
+	}
+}
+
+.picker--opened .picker__holder {
+	background-color: rgba(0, 0, 0, 0.5);
+}
+
+.picker__day--today:before {
+ 	border-top-color: #fff;
+}
+.picker__button--today:before {
+ 	border-top-color: #fff;
+}
+
+.picker__nav--prev {
+
+	&:before {
+		border-right-color: #a1a1a1;
+	}
+
+	&:hover {
+		background-color: transparent;
+		&:before {
+			border-right-color: #A3E344;
+		}
+	}
+}
+
+.picker__nav--disabled {
+	&:before {
+		.opacity(0.4);
+	}
 }

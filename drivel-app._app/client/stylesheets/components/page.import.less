@@ -3,10 +3,12 @@
 	position: fixed;
 	width: 100%;
 	top: 98.25px;
+	height: 95px;
 	padding: 30px 20px 25px 30px;
 	background-color: #2D2D2D;
 	left: 0px;
-	z-index: 100;
+	z-index: 100;    
+	box-shadow: 0px 0px 35px 0px rgba(0,0,0,0.3);
 	.bg {
 		position: absolute;
 		display: block;
@@ -44,11 +46,41 @@
 			border: 2px solid #7bb724;
 		}
 	}
+
+	.btn-default {
+		background-color: transparent;
+		border-color: transparent;
+		color: #c3c3c3;
+		&:hover {
+			color: #fff;
+			background-color: transparent;
+			border-color: transparent;
+		}
+	}
+
+	.form-control {
+		height: 35px;
+		font-size: 16px;
+		border-bottom-color: #565656!important;
+	}
+}
+	.page-title--link {
+		color: #91BC4F;
+	}
+
+.main-content {    
+	padding-top: 93px;
+	color: #968C8C;
+    position: relative;
+    min-height: 100%;
+    padding-bottom: 64px;
+    overflow-x: auto;
+    max-width: 100%;
 }
 
-.main-content {
-	padding-top: 193px;
-	color: #968C8C;
+.section-header-switch {
+	top: 9px;
+    position: relative;
 }
 
 .page-tabs {
@@ -57,4 +89,5 @@
     top: 193px;
     z-index: 1000;
     border-bottom: 0px;
+    padding-left: 10px;
 }

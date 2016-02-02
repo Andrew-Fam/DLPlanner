@@ -8,6 +8,9 @@ Template.Learners.events({
 /* Learners: Helpers */
 /*****************************************************************************/
 Template.Learners.helpers({
+	learners : function() {
+		return Learners.find();
+	}
 });
 
 /*****************************************************************************/

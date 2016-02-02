@@ -34,8 +34,6 @@ Template.New.events({
 
 		var previousMarker;
 
-		console.log(dayOfWeekArray);
-
 		for(var i = 0; i<dayOfWeekArray.length; i++) {
 
 			var currentTimeBlock = dayOfWeekArray[i];
@@ -68,6 +66,40 @@ Template.New.events({
 								dayOfWeekArray[j].markerType = undefined;
 							}
 						}
+					} else {
+
+						// clear active marker to start of current block
+
+						for (var j = i-1; j >= 0 ; j--) {
+
+							dayOfWeekArray[j].active = false;
+
+							if(dayOfWeekArray[j].markerType == 'start') {
+								dayOfWeekArray[j].markerType = undefined;
+								break;
+							} else {
+								dayOfWeekArray[j].markerType = undefined;
+							}
+
+						}
+
+						// clear active marker to end of current block
+
+						for (var j = i; j < dayOfWeekArray.length ; j++) {
+
+							dayOfWeekArray[j].active = false;
+
+							if(dayOfWeekArray[j].markerType == 'end') {
+								dayOfWeekArray[j].markerType = undefined;
+								break;
+							} else {
+								dayOfWeekArray[j].markerType = undefined;
+							}
+
+						}
+
+						$('.availability-picker--all-day-toggle--input[data-day-of-week=\''+this.date+'\'').iCheck('uncheck');
+
 					}
 
 					break;
@@ -76,18 +108,9 @@ Template.New.events({
 				
 			} else {
 
-				console.log('Current Block not active')
-
 				if(i==this.index) {
 
-					console.log('Current Block is clicked block');
-
-					console.log('Previous marker is: ');
-					console.log(previousMarker);
-
 					if(previousMarker!=undefined) {
-
-						console.log('Previous marker is not undefined!');
 
 						if(previousMarker.markerType == 'start') {
 							currentTimeBlock.active = true;
@@ -95,7 +118,6 @@ Template.New.events({
 
 							for(var j = previousMarker.index+1; j < i; j++ ) {
 
-								console.log(j);
 								var inBetweenTimeBlock = dayOfWeekArray[j];
 
 								inBetweenTimeBlock.active = true;
@@ -111,8 +133,6 @@ Template.New.events({
 						currentTimeBlock.markerType = 'start';
 					}
 
-					console.log(currentTimeBlock);
-
 					break;
 					
 				}
@@ -122,6 +142,119 @@ Template.New.events({
 		}
 
 		Session.set('newLearner',newLearner);
+
+	},
+	'ifChecked .availability-picker--all-day-toggle--input' : function(e) {
+		var element = $(e.currentTarget);
+
+		var newLearner = Session.get('newLearner');
+
+		var dayOfWeekArray = newLearner.availability[element.data('dayOfWeek')];
+
+		for(var i = 0; i<dayOfWeekArray.length; i++) {
+			dayOfWeekArray[i].active = true;
+			if(i==0) {
+				dayOfWeekArray[i].markerType = 'start';
+			} else if (i == dayOfWeekArray.length-1) {
+				dayOfWeekArray[i].markerType = 'end';
+			} else {
+				dayOfWeekArray[i].markerType = 'in-between';
+			}
+		}
+
+		Session.set('newLearner',newLearner);
+	},
+	'ifUnchecked .availability-picker--all-day-toggle--input' : function(e) {
+		var element = $(e.currentTarget);
+
+		var newLearner = Session.get('newLearner');
+
+		var dayOfWeekArray = newLearner.availability[element.data('dayOfWeek')];
+
+		for(var i = 0; i<dayOfWeekArray.length; i++) {
+			dayOfWeekArray[i].active = false;
+			dayOfWeekArray[i].markerType = undefined;
+		}
+
+		Session.set('newLearner',newLearner);
+	},
+	'click #save-new-learner' : function(e) {
+
+		var newLearner = Session.get('newLearner');
+
+		newLearner.dob = $('#dob_hidden').val(),
+
+		newLearner.address = $('#address').val(),
+
+		newLearner.suburb = $('#suburb').val(),
+
+		newLearner.license = {
+			type : $('#international-license-check').is(':checked')?'international':'local',
+			number : $('#license-number').val(),
+			cardNumber : $('#card-number').val(),
+			expiry: $('expiry_hidden').val()
+		},
+
+		newLearner.needLogBook = $('#log-book-check').val(),
+
+		newLearner.onHoliday = $('#holiday-check').val(),
+
+		newLearner.note = $('#notes').val();
+
+		if(newLearner.fullName == '') {
+
+			sAlert.error('Please provide a name/alias for this learner');
+
+			return;
+		}
+
+		var requiredFields = [
+			newLearner.dob,
+			newLearner.fullName,
+			newLearner.license.number,
+			newLearner.license.expiry
+		];
+
+		var missingFields = false;
+
+		for (var i = 0; i<requiredFields.length;i++ ) {
+			if(requiredFields[i]=='') {
+
+				missingFields = true;
+
+				break;
+			}
+		}
+
+		/**
+		 * This tiny script just helps us demonstrate
+		 * what the various example callbacks are doing
+		 */
+		
+
+		if(missingFields) {
+			bootbox.confirm("Some important fields are missing. Do you want to save this learner anyway?", function(result) {
+			  	
+				if(result) {
+					saveNewLearner ();
+				}
+
+			}); 
+		} else {
+			saveNewLearner ();
+		}
+
+		function saveNewLearner () {
+			Meteor.call('saveNewLearner',newLearner, function(error, result){
+
+				console.log(error);
+				console.log(result);
+
+			});
+		}
+
+
+		
 
 	}
 });
@@ -170,7 +303,6 @@ Template.New.onRendered(function () {
 	var totalUnitPerday = 60;
 	var startTime = 6;
 	var endTime = 21;
-
 
 	var newLearner = {
 		fullName: '',
@@ -245,6 +377,9 @@ Template.New.onRendered(function () {
 
 	Session.set('newLearner',newLearner);
 
+
+	
+
 	var elem = $('.js-switch');
 
 	elem.each(function(){
@@ -261,15 +396,18 @@ Template.New.onRendered(function () {
 	$('.icheck').iCheck({
 	  labelHover: false,
 	  cursor: true,
-	  checkboxClass: 'icheckbox_flat',
-    	radioClass: 'iradio_flat'
+	  checkboxClass: 'icheckbox_polaris',
+    	radioClass: 'iradio_polaris'
 	});
 
 
 	$('.date-picker').pickadate({
 		selectYears: 100,
   		selectMonths: true,
-  		max: new Date()
+  		max: new Date(),
+  		format: 'dd mmmm, yyyy',
+		formatSubmit: 'yyyy/mm/dd',
+		hiddenPrefix: 'real__'
 	});
 });
 

@@ -4,9 +4,32 @@
 .drivel-app-less {
 }
 
+html {
+	height: 100%;
+	position: relative;
+}
+
 body {
 	padding-top: 100px;
-	background-color: #2B2C2D;
+	height: 100%;
+	position: relative;
+	background-color: #1f1f1f;
+	&:before {
+		content: "";    
+		position: fixed;
+		display: block;
+		left: 0px;
+		top: 0px;
+		bottom: 0px;
+		right: 0px;
+		z-index: 1!important;
+		.opacity(0.1);
+		background-image: url(/pattern.png);
+	}
+	> * {
+		position: relative;
+		z-index: 2;
+	}
 }
 
 
@@ -17,3 +40,7 @@ body {
 @import "components/page.import.less";
 @import "components/new.import.less";
 @import "components/availability-picker.import.less";
+@import "components/form-control.import.less";
+@import "components/modal.import.less";
+@import "components/learners.import.less";
+@import "components/pagination.import.less";
