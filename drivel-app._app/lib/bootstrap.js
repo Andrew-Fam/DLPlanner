@@ -6,6 +6,6 @@ Meteor.startup(function () {
 		navShowFirst: false,
 		navShowLast: false,
 		onReloadPage1: true,
-		perPage: 5
+		perPage: 6
 	});
 });

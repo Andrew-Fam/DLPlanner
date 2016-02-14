@@ -18,22 +18,29 @@
   	<div class="learner-item--needs-more-details">
   		This learner profile is incomplete.
   	</div>
-    <button class="btn btn-default learner-item--update-profile-btn"> 
+    <button class="btn btn-default btn-xs learner-item--update-profile-btn"> 
       EDIT
     </button>
     {{else}}
     <div class="learner-item--created">
-   	 	<label>
-    	Created
-    	</label>
-    	{{#if created_on}}{{at}}{{else}}unknown{{/if}}
-    </div>
+      {{#if updated_on}}
+        <label>
+          Updated
+        </label>
+        {{updated_on_readable}}
+      {{else}}
+        <label>
+          Created
+        </label>
+        {{#if created_on}}{{at}}{{else}}unknown{{/if}}
+   	 	{{/if}}
+    </div>  
     <div class="clearfix">
       <div class="learner-item--license">
       	<label>
-      	License number
+      	Pick-up area:
       	</label>
-      	{{license.number}}
+      	{{suburb}}&nbsp;
       </div>
       <div class="learner-item--phone">
       	<label>
@@ -42,7 +49,7 @@
       	{{phone}}
       </div>
     </div>
-    <button class="btn btn-default learner-item--view-profile-btn"> 
+    <button class="btn btn-default btn-xs learner-item--view-profile-btn"> 
       VIEW
     </button>
     {{/if}}

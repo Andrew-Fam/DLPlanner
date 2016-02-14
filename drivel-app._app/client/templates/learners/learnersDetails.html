@@ -1,27 +1,42 @@
-<template name="New">
-	<div class="new">
+<template name="LearnersDetails">
+	<div class="learners-details">
 		<div class="new--in-progress">
 			<span class="new--in-progress--message">
-				Creating new learner&hellip;
+				Saving &hellip;
 			</span>
 		</div>
 		<div class="clearfix page-title">
 			<div class="bg">
 			</div>
 			<h3 class="pull-left">
-				{{newLearnerName}}
+				{{currentLearnerName}}
 			</h3>
-			<button id="save-new-learner" class="btn btn-primary btn-md pull-right">
-				&nbsp;&nbsp;&nbsp;SAVE&nbsp;&nbsp;&nbsp;
-			</button>
-			<button id="reset-new-learner" class="btn btn-default btn-md pull-right">
-				&nbsp;&nbsp;&nbsp;Reset&nbsp;&nbsp;&nbsp;
-			</button>
+			<div class="pull-left">
+				&nbsp;
+				&nbsp;
+			</div>
+			<h5 class="pull-left">
+				<a class="page-title--link" href="tel:{{phone}}">
+					<i class="fa fa-fw fa-phone"></i>
+					{{learner.phone}}
+				</a>
+			</h5>
+			<span class="clearfix pull-right">
+				<button id="save-learner" class="btn btn-primary btn-md pull-right">
+					&nbsp;&nbsp;&nbsp;SAVE&nbsp;&nbsp;&nbsp;
+				</button>
+				<button id="reset-learner" class="btn btn-default btn-md pull-right">
+					&nbsp;&nbsp;&nbsp;Reset&nbsp;&nbsp;&nbsp;
+				</button>
+				<button id="delete-learner" class="btn btn-danger btn-md pull-right">
+					&nbsp;&nbsp;&nbsp;Delete&nbsp;&nbsp;&nbsp;
+				</button>
+			</span>
 		</div>
 		<ul class="nav nav-tabs page-tabs" role="tablist">
 		    <li role="presentation" class="active"><a href="#personal-id" aria-controls="home" role="tab" data-toggle="tab">Personal Details</a></li><!--
 		    --><li role="presentation" class=""><a href="#learner-availability" aria-controls="profile" role="tab" data-toggle="tab">Availability</a></li><!--
-		    --><li role="presentation" class=""><a href="#lesson-history" aria-controls="lesson-history" role="tab" data-toggle="tab">Lesson History</a></li><li role="presentation" class=""><a href="#payments" aria-controls="payment" role="tab" data-toggle="tab">Payments</a></li>
+		    --><li role="presentation" class=""><a href="#lesson-history" aria-controls="lesson-history" role="tab" data-toggle="tab">Lesson History</a></li><li role="presentation" class=""><a href="#payments" aria-controls="payments" role="tab" data-toggle="tab">Payments</a></li>
 		</ul>
 		<br/>
 		<div class="tab-content">
@@ -36,13 +51,13 @@
 									<div class="col-sm-8">
 										<div class="form-group">
 											<label for="fullName">Full Name</label>
-											<input type="text" class="form-control" id="fullName" placeholder="Enter full name">
+											<input type="text" class="form-control" id="fullName" value="">
 										</div>
 									</div>
 									<div class="col-sm-8">
 										<div class="form-group">
 											<label for="alias">Alias</label>
-											<input type="text" class="form-control" id="alias" placeholder="e.g Tuan City">
+											<input type="text" class="form-control" id="alias" value="">
 										</div>
 									</div>
 								</div>
@@ -50,13 +65,13 @@
 									<div class="col-sm-8">
 										<div class="form-group">
 											<label for="dob">Date of Birth</label>
-											<input type="text" class="form-control date-picker" id="dob" name="dob" placeholder="Pick a date">
+											<input type="text" class="form-control date-picker" id="dob" name="dob" value="">
 										</div>
 									</div>
 									<div class="col-sm-8">
 										<div class="form-group">
 											<label for="phone">Phone</label>
-											<input type="text" class="form-control" id="phone" >
+											<input type="text" class="form-control" id="phone"  value="">
 										</div>
 									</div>
 								</div>
@@ -64,13 +79,13 @@
 									<div class="col-sm-8">
 										<div class="form-group">
 											<label for="address">Address</label>
-											<input type="text" class="form-control" id="address" placeholder="Street Address">
+											<input type="text" class="form-control" id="address" value="">
 										</div>
 									</div>
 									<div class="col-sm-8">
 										<div class="form-group">
 											<label for="suburb">Pick-up</label>
-											<input type="text" class="form-control" id="suburb" placeholder="e.g Cabramatta">
+											<input type="text" class="form-control" id="suburb" value="">
 										</div>
 									</div>
 								</div>
@@ -79,7 +94,7 @@
 									<div class="col-sm-4">
 										<div class="form-group">
 											<label>
-									          	<input class="icheck" id="log-book-check" type="checkbox"> &nbsp;&nbsp;Need Log-book?
+									          	<input class="icheck" id="log-book-check" type="checkbox"> &nbsp;&nbsp; Need Log-book?
 									        </label>
 										</div>
 									</div>
@@ -113,7 +128,7 @@
 									<div class="col-sm-16">
 										<div class="form-group">
 											<label for="license-number">License Number</label>
-											<input type="text" class="form-control" id="license-number" placeholder="Enter license number">
+											<input type="text" class="form-control" id="license-number" value="">
 										</div>
 									</div>
 								</div>
@@ -121,7 +136,7 @@
 									<div class="col-sm-16">
 										<div class="form-group">
 											<label for="card-number">Card Number</label>
-											<input type="text" class="form-control" id="card-number" placeholder="Check back side of license">
+											<input type="text" class="form-control" id="card-number" value="">
 										</div>
 									</div>
 								</div>
@@ -129,7 +144,7 @@
 									<div class="col-sm-16">
 										<div class="form-group">
 											<label for="expiry">Expiry</label>
-											<input type="text" class="form-control date-picker" id="expiry" name="expiry" placeholder="Pick a date">
+											<input type="text" class="form-control date-picker" id="expiry" name="expiry" value="">
 										</div>
 									</div>
 								</div>
@@ -314,30 +329,6 @@
 								<label>
 						          	<input class="icheck availability-picker--all-day-toggle--input" type="checkbox" data-day-of-week="sun"> ALL-DAY
 						        </label>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div role="tabpanel" class="tab-pane" id="lesson-history">
-				<div class="container-fluid">
-					<div class="container-fluid">
-						<div class="row">
-							<div class="col-sm-8">
-								<h6>LESSON HISTORY</h6>
-								
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div role="tabpanel" class="tab-pane" id="payments">
-				<div class="container-fluid">
-					<div class="container-fluid">
-						<div class="row">
-							<div class="col-sm-8">
-								<h6>PAYMENTS</h6>
-								
 							</div>
 						</div>
 					</div>

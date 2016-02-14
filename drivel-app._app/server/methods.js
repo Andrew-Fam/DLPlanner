@@ -12,7 +12,21 @@ Meteor.methods({
 
   	var learnerId = Learners.insert(learnerItem);
 
-	return learnerId;
+  	learnerItem._id = learnerId;
+
+	return learnerItem;
+
+  },
+  'saveCurrentLearner' : function(learnerItem) {
+
+  	learnerItem.updated_on = new Date().getTime();
+
+
+  	console.log(learnerItem);
+
+  	var updatedId = Learners.update(learnerItem._id,learnerItem);
+
+	return learnerItem;
 
   }
 });

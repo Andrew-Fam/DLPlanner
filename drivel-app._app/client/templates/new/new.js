@@ -178,33 +178,98 @@ Template.New.events({
 
 		Session.set('newLearner',newLearner);
 	},
-	'click #save-new-learner' : function(e) {
+	'click #reset-new-learner' : function(e) {
+
 
 		var newLearner = Session.get('newLearner');
 
-		newLearner.dob = $('#dob_hidden').val(),
+		newLearner.dob = '';
 
-		newLearner.address = $('#address').val(),
+		newLearner.fullName = '';
 
-		newLearner.suburb = $('#suburb').val(),
+		newLearner.alias = '';
+
+		newLearner.phone = '';
+
+		newLearner.address = '',
+
+		newLearner.suburb = '',
+
+		newLearner.license = {
+			type : 'local',
+			number : '',
+			cardNumber : '',
+			expiry: ''
+		},
+
+		newLearner.needLogBook = '',
+
+		newLearner.onHoliday = '',
+
+		newLearner.note = '';
+
+		$('#dob_hidden, #dob, #fullName, #alias, #address, #suburb, #phone, #notes, #pickup').val('');
+
+		$('#international-license-check').prop('checked',false);
+
+		$('#log-book-check').prop('checked',false);
+
+		$('#holiday-check').prop('checked',false);
+
+		for(var i=0; i< newLearner.availability.mon.length; i++) {
+			newLearner.availability.mon[i].active = false;
+			newLearner.availability.mon[i].markerType = undefined;
+			newLearner.availability.tue[i].active = false;
+			newLearner.availability.tue[i].markerType = undefined;
+			newLearner.availability.wed[i].active = false;
+			newLearner.availability.wed[i].markerType = undefined;
+			newLearner.availability.thu[i].active = false;
+			newLearner.availability.thu[i].markerType = undefined;
+			newLearner.availability.fri[i].active = false;
+			newLearner.availability.fri[i].markerType = undefined;
+			newLearner.availability.sat[i].active = false;
+			newLearner.availability.sat[i].markerType = undefined;
+			newLearner.availability.sun[i].active = false;
+			newLearner.availability.sun[i].markerType = undefined;
+		}
+
+		Session.set('newLearner',newLearner);
+
+		sAlert.info('New learner\'s details have been reset.',{
+        	effect: ''
+		});
+
+	},
+	'click #save-new-learner' : function(e) {
+
+		$('.new--in-progress').addClass('in');
+
+		var newLearner = Session.get('newLearner');
+
+		newLearner.dob = $('#dob_hidden').val();
+
+		newLearner.address = $('#address').val();
+
+		newLearner.suburb = $('#suburb').val();
 
 		newLearner.license = {
 			type : $('#international-license-check').is(':checked')?'international':'local',
 			number : $('#license-number').val(),
 			cardNumber : $('#card-number').val(),
-			expiry: $('expiry_hidden').val()
-		},
+			expiry: $('#expiry_hidden').val()
+		};
 
-		newLearner.needLogBook = $('#log-book-check').val(),
+		newLearner.needLogBook = $('#log-book-check').is(':checked');
 
-		newLearner.onHoliday = $('#holiday-check').val(),
+		newLearner.onHoliday = $('#holiday-check').is(':checked');
 
 		newLearner.note = $('#notes').val();
 
 		if(newLearner.fullName == '') {
 
 			sAlert.error('Please provide a name/alias for this learner');
-
+			$('.new--in-progress').removeClass('in');
+			
 			return;
 		}
 
@@ -249,6 +314,15 @@ Template.New.events({
 
 				console.log(error);
 				console.log(result);
+
+				$('.new--in-progress').removeClass('in');
+
+				if(error==undefined) {
+					sAlert.success('Learner '+(result.alias||result.fullName)+' created');
+					Router.go('learnersDetails',{ _id: result._id});
+				} else {
+					sAlert.error(error);
+				}
 
 			});
 		}
@@ -401,10 +475,18 @@ Template.New.onRendered(function () {
 	});
 
 
-	$('.date-picker').pickadate({
+	$('#dob').pickadate({
 		selectYears: 100,
   		selectMonths: true,
   		max: new Date(),
+  		format: 'dd mmmm, yyyy',
+		formatSubmit: 'yyyy/mm/dd',
+		hiddenPrefix: 'real__'
+	});
+
+	$('#expiry').pickadate({
+		selectYears: 6,
+  		selectMonths: true,
   		format: 'dd mmmm, yyyy',
 		formatSubmit: 'yyyy/mm/dd',
 		hiddenPrefix: 'real__'

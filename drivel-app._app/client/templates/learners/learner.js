@@ -2,6 +2,12 @@
 /* Learner: Event Handlers */
 /*****************************************************************************/
 Template.Learner.events({
+	'click .learner-item--view-profile-btn' : function(e){
+		Router.go('learnersDetails',{ _id: this._id});
+	},
+	'click .learner-item--update-profile-btn' : function(e){
+		Router.go('learnersDetails',{ _id: this._id});
+	}
 });
 
 /*****************************************************************************/
@@ -28,6 +34,9 @@ Template.Learner.helpers({
 		}
 
 		return missingFields;
+	},
+	updated_on_readable : function() {
+		return moment(this.updated_on).fromNow();
 	},
 	at : function() {
 		return moment(this.created_on).fromNow();
