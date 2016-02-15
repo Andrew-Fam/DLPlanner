@@ -43,23 +43,25 @@
 		</ul>
 		<br/>
 		<div class="tab-content">
-			<div role="tabpanel" class="tab-pane active" id="mon">
-				<div class="container-fluid">
+			{{#each daysOfWeek}}
+				<div role="tabpanel" class="tab-pane" id="{{this}}">
 					<div class="container-fluid">
+						<div class="container-fluid">
 
-						{{#with dayOfWeek='mon'}}
+							{{#with dayOfWeek=this}}
 
-							{{#each learnersOfDay}}
+								{{#each learnersOfDay}}
 
-								{{this.fullName}}
+									{{> LearnerAvailability}}
 
-							{{/each}}
+								{{/each}}
 
-						{{/with}}
+							{{/with}}
 
+						</div>
 					</div>
 				</div>
-			</div>
+			{{/each}}
 		</div>
 	</div>
 </template>

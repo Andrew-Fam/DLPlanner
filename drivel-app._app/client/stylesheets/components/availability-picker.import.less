@@ -6,6 +6,9 @@
 	&:first-child {
 		margin-top: -13px;
 	}
+	.learner-availability & { 
+		margin-bottom: 35px;
+	}
 }
 	.availability-picker--date-label {
 		font-weight: 500;
@@ -17,6 +20,9 @@
 		letter-spacing: 0.2em;
 		color: #968C8C;
 		font-family: 'Montserrat', 'MontserratRegular', sans-serif;
+		.learner-availability & {
+			width: 160px;
+		}
 	}
 
 	.availability-picker--time-unit-container {
@@ -66,7 +72,7 @@
 						display: block;
 						content: "";
 						width: 3px;
-						height: 30px;
+						height: 24px;
 						bottom: 0px;
 						left: -1px;
 						top: auto;
@@ -79,7 +85,7 @@
 						display: block;
 						content: "";
 						width: 3px;
-						height: 30px;
+						height: 24px;
 						bottom: 0px;
 						right: -1px;
 						position: absolute;
@@ -97,6 +103,8 @@
 				display: none;
 				width: 40px;
 				text-align: center;
+
+
 
 				&.end {
 					left: auto;
@@ -118,6 +126,12 @@
     				font-weight: 300;
 					letter-spacing: 0.025em;
 					.opacity(0.4);
+				}
+
+				.learner-availability .hour & {
+					&.default {
+						display: none;
+					}
 				}
 
 				.availability-picker--time-unit.active.start &,

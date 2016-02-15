@@ -185,6 +185,8 @@ Template.LearnersDetails.events({
 
 		newLearner.note = $('#notes').val();
 
+		newLearner.passed = $('#passed').is(':checked');
+
 		if(newLearner.fullName == '') {
 
 			sAlert.error('Please provide a name/alias for this learner');
@@ -401,6 +403,10 @@ Template.LearnersDetails.onRendered(function () {
 
 	if(this.data.onHoliday) {
 		$('#holiday-check').iCheck('check');
+	}
+
+	if(this.data.passed) {
+		$('#passed').iCheck('check');
 	}
 
 	if(this.data.needLogBook) {

@@ -216,6 +216,8 @@ Template.New.events({
 
 		$('#holiday-check').prop('checked',false);
 
+		$('#passed').prop('checked',false);
+
 		for(var i=0; i< newLearner.availability.mon.length; i++) {
 			newLearner.availability.mon[i].active = false;
 			newLearner.availability.mon[i].markerType = undefined;
@@ -264,6 +266,8 @@ Template.New.events({
 		newLearner.onHoliday = $('#holiday-check').is(':checked');
 
 		newLearner.note = $('#notes').val();
+
+		newLearner.passed = $('#passed').is(':checked');
 
 		if(newLearner.fullName == '') {
 

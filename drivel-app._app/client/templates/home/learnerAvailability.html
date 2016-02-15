@@ -1,0 +1,22 @@
+<template name="LearnerAvailability">
+	<div class="learner-availability availability-picker clearfix" id="availability-picker--tue">
+		<div class="availability-picker--date-label">
+			{{#if alias}}{{alias}}{{else}}{{fullName}}{{/if}}
+		</div>
+		<div class="availability-picker--time-unit-container clearfix">
+		{{#each dayAvailability}}
+			<div class="availability-picker--time-unit {{#if this.hourMark}}hour{{/if}} {{#if this.active}}active{{/if}} {{this.markerType}}" >
+				<div class="availability-picker--time-unit--time-label start">
+					{{this.start.hour}}:{{this.start.minute}}
+				</div>
+				<div class="availability-picker--time-unit--time-label default">
+					{{this.start.hour}}:{{this.start.minute}}
+				</div>
+				<div class="availability-picker--time-unit--time-label end">
+					{{this.end.hour}}:{{this.end.minute}}
+				</div>
+			</div>
+		{{/each}}
+		</div>
+	</div>
+</template>
