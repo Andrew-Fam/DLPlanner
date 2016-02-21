@@ -8,38 +8,36 @@ Meteor.methods({
   },
   'saveNewLearner' : function(learnerItem) {
 
+    if(Meteor.userId()) {
+      learnerItem.created_on = new Date().getTime();
 
-    if ( ServerSession.get('authenticated') ) {
-      
+      var learnerId = Learners.insert(learnerItem);
+
+      learnerItem._id = learnerId;
+
+      return learnerItem;
     } else {
-      return false;
+      throw new Meteor.error( 403, 'You need to login to execute this');
     }
 
-  	learnerItem.created_on = new Date().getTime();
-
-  	var learnerId = Learners.insert(learnerItem);
-
-  	learnerItem._id = learnerId;
-
-	return learnerItem;
+  	
 
   },
   'saveCurrentLearner' : function(learnerItem) {
 
-    if ( ServerSession.get('authenticated') ) {
+    if(Meteor.userId()) {
       
+
+    	learnerItem.updated_on = new Date().getTime();
+
+    	console.log(learnerItem);
+
+    	var updatedId = Learners.update(learnerItem._id,learnerItem);
+
+  	   return learnerItem;
     } else {
-      return false;
+      throw new Meteor.error( 403, 'You need to login to execute this');
     }
-
-  	learnerItem.updated_on = new Date().getTime();
-
-
-  	console.log(learnerItem);
-
-  	var updatedId = Learners.update(learnerItem._id,learnerItem);
-
-	return learnerItem;
 
   },
   'customLogout' : function() {
