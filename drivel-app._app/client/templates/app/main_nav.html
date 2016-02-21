@@ -9,6 +9,8 @@
 		        <span class="icon-bar"></span>
 		      </button>
 		      <a class="navbar-brand" href="#">JASON <small>driving school</small></a>
+
+
 		    </div>
 		    <!-- <div class="navbar-form navbar-left" role="search">
 		    	<div class="form-group">
@@ -35,6 +37,15 @@
 		    				Learners
 		    			</a>
 		    		</li>
+		    		{{#if currentUser}}
+			    		<li>
+					      <a id="logout">
+					      	<i class="icon-power"></i>
+					      	Logout
+					      </a>
+					    </li>
+				    {{else}}
+				   	{{/if}}
 		    	</ul>
 		    </div><!-- /.navbar-collapse -->
 	  	</div>

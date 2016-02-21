@@ -14,6 +14,7 @@ HomeController = RouteController.extend({
   // return Meteor.subscribe('post', this.params._id);
   
   waitOn: function () {
+
   },
   
   // A data function that can be used to automatically set the data context for
@@ -46,6 +47,11 @@ HomeController = RouteController.extend({
   //  action: 'myActionFunction'
   
   action: function () {
+    // if ( ServerSession.get('authenticated') == 'authenticated' ) {
+      
+    // } else {
+    //   Router.go('loginPage');  
+    // }
     this.render();
   },
   onAfterAction: function () {

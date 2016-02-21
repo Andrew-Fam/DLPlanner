@@ -46,6 +46,11 @@ LearnersController = RouteController.extend({
   //  action: 'myActionFunction'
   
   action: function () {
+    // if ( ServerSession.get('authenticated') == 'authenticated' ) {
+      
+    // } else {
+    //   Router.go('loginPage');  
+    // }
     this.render();
   },
   onAfterAction: function () {

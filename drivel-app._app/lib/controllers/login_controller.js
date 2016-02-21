@@ -1,4 +1,4 @@
-NewController = RouteController.extend({
+LoginPageController = RouteController.extend({
   
   // A place to put your subscriptions
   // this.subscribe('items');
@@ -46,11 +46,6 @@ NewController = RouteController.extend({
   //  action: 'myActionFunction'
   
   action: function () {
-    // if ( ServerSession.get('authenticated') == 'authenticated' ) {
-      
-    // } else {
-    //   Router.go('loginPage');  
-    // }
     this.render();
   },
   onAfterAction: function () {

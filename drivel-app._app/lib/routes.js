@@ -4,6 +4,11 @@ Router.configure({
   notFoundTemplate: 'NotFound'
 });
 
+Router.route('/login', {
+  name: 'loginPage',
+  template: 'LoginPage',
+  controller: 'LoginPageController'
+})
 
 Router.route('/', {
   name: 'home',
@@ -31,4 +36,22 @@ Router.route('learners/:_id', {
   template: 'LearnersDetails',
   controller: 'LearnersDetailsController',
   where: 'client'
+});
+
+Router.plugin('auth', {
+  authenticate: {
+    route: 'loginPage'
+  },
+  except: [
+    'loginPage'
+  ],
+  authorize: {
+    allow: function() {
+      if (Meteor.userId() != undefined && Meteor.userId() != null)
+        return true
+      else
+        return false
+    },
+    template: 'LoginPage'
+  }
 });

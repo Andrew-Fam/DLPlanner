@@ -284,7 +284,11 @@ Template.LearnersDetails.events({
 			$('#log-book-check').iCheck('check');
 		}
 
-		if(this.data.license.type=='international') {
+		if(this.passed) {
+			$('#passed').iCheck('check');
+		}
+
+		if(this.license.type=='international') {
 			$('#international-license-check').prop('checked',true);
 
 
